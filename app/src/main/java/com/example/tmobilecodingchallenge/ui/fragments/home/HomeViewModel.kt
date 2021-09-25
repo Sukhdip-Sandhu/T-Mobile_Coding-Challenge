@@ -1,10 +1,10 @@
 package com.example.tmobilecodingchallenge.ui.fragments.home
 
-import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tmobilecodingchallenge.models.HomePageFeed
-import com.example.tmobilecodingchallenge.repository.HomeFeedRepository
 import com.example.tmobilecodingchallenge.repository.HomeFeedRepositoryImpl
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.catch
@@ -18,6 +18,9 @@ class HomeViewModel @Inject constructor(
     private val homeFeedRepository: HomeFeedRepositoryImpl
 ) : ViewModel() {
 
+    private val _viewState = MutableLiveData<ViewState>()
+    val viewState : LiveData<ViewState> = _viewState
+
     init {
         getHomePageFeed()
     }
@@ -26,15 +29,21 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             homeFeedRepository.getHomePageFeed()
                 .onStart {
-
+                    _viewState.value = ViewState.Loading
                 }
                 .catch {
-
+                    _viewState.value = ViewState.Error("An unknown error occurred")
                 }
                 .collect { homePageFeed ->
-
+                    _viewState.value = ViewState.Success(homePageFeed)
                 }
         }
+    }
+
+    sealed class ViewState {
+        object Loading: ViewState()
+        data class Success(val homePageFeed: HomePageFeed): ViewState()
+        data class Error(val error: String): ViewState()
     }
 
 }

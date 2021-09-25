@@ -1,12 +1,11 @@
 package com.example.tmobilecodingchallenge.ui.fragments.home
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.example.tmobilecodingchallenge.R
 import com.example.tmobilecodingchallenge.databinding.FragmentHomeBinding
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -23,7 +22,21 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
-        homeViewModel
+
+        homeViewModel.viewState.observe(viewLifecycleOwner) { state ->
+            when(state){
+                is HomeViewModel.ViewState.Success -> {
+                    binding.progressBar.visibility = View.INVISIBLE
+                }
+                is HomeViewModel.ViewState.Error -> {
+                    binding.progressBar.visibility = View.INVISIBLE
+                }
+                HomeViewModel.ViewState.Loading -> {
+                    binding.progressBar.visibility = View.VISIBLE
+                }
+            }
+        }
+
         return binding.root
     }
 
