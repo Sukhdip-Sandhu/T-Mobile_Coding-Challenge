@@ -1,7 +1,8 @@
-package com.example.tmobilecodingchallenge
+package com.example.tmobilecodingchallenge.ui
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import com.example.tmobilecodingchallenge.R
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
