@@ -2,8 +2,10 @@ package com.example.tmobilecodingchallenge.repository
 
 import com.example.tmobilecodingchallenge.api.HomePageFeedApi
 import com.example.tmobilecodingchallenge.models.HomePageFeed
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -17,7 +19,7 @@ class HomeFeedRepositoryImpl @Inject constructor(
         return flow {
             val response = homePageFeedApi.getHomePageFeed()
             emit(response)
-        }
+        }.flowOn(Dispatchers.IO)
     }
 
 }
