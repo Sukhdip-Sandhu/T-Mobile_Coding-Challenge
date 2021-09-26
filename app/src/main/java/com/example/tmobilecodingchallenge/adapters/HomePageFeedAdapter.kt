@@ -99,6 +99,7 @@ class HomePageFeedAdapter : RecyclerView.Adapter<HomePageFeedAdapter.ViewHolder>
 
     fun setCardsList(cardsList: List<Cards>?) {
         this.listOfCards = cardsList!!
+        // In an actual application, I would use DiffUtil instead of notifyDataSetChanged() for better performance.
         notifyDataSetChanged()
     }
 
