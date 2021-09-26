@@ -4,12 +4,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.tmobilecodingchallenge.adapters.HomePageFeedAdapter
 import com.example.tmobilecodingchallenge.databinding.FragmentHomeBinding
 import com.example.tmobilecodingchallenge.models.Cards
+import com.example.tmobilecodingchallenge.util.Resource
 import dagger.hilt.android.AndroidEntryPoint
 
 private lateinit var homePageFeedAdapter: HomePageFeedAdapter
@@ -30,26 +32,11 @@ class HomeFragment : Fragment() {
 
         setupRecyclerView()
 
-        homeViewModel.viewState.observe(viewLifecycleOwner) { state ->
-            when (state) {
-                is HomeViewModel.ViewState.Success -> {
-                    binding.progressBar.visibility = View.INVISIBLE
-                    binding.errorView.visibility = View.GONE
-
-                    setCardsList(state.homePageFeed.page.cards)
-                }
-                is HomeViewModel.ViewState.Error -> {
-                    binding.progressBar.visibility = View.INVISIBLE
-                    binding.errorView.visibility = View.VISIBLE
-
-                    binding.errorTextview.text = state.error
-                    binding.retryButton.setOnClickListener { homeViewModel.onRetry() }
-                }
-                HomeViewModel.ViewState.Loading -> {
-                    binding.progressBar.visibility = View.VISIBLE
-                    binding.errorView.visibility = View.GONE
-                }
-            }
+        homeViewModel.cards.observe(viewLifecycleOwner) { resource ->
+            setCardsList(resource.data)
+            binding.progressBar.isVisible = resource is Resource.Loading && resource.data.isNullOrEmpty()
+            binding.errorView.isVisible = resource is Resource.Error && resource.data.isNullOrEmpty()
+            binding.errorTextview.text = resource.error?.localizedMessage
         }
 
         return binding.root
@@ -63,7 +50,7 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun setCardsList(cards: List<Cards>) {
+    private fun setCardsList(cards: List<Cards>?) {
         homePageFeedAdapter.setCardsList(cards)
     }
 

@@ -1,25 +1,32 @@
 package com.example.tmobilecodingchallenge.repository
 
 import com.example.tmobilecodingchallenge.api.HomePageFeedApi
-import com.example.tmobilecodingchallenge.models.HomePageFeed
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
-
+import com.example.tmobilecodingchallenge.db.CardsDao
+import com.example.tmobilecodingchallenge.util.networkBoundResource
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class HomeFeedRepositoryImpl @Inject constructor(
-    private val homePageFeedApi: HomePageFeedApi
+    private val homePageFeedApi: HomePageFeedApi,
+    private val dao: CardsDao
 ) : HomeFeedRepository {
 
-    override fun getHomePageFeed(): Flow<HomePageFeed> {
-        return flow {
-            val response = homePageFeedApi.getHomePageFeed()
-            emit(response)
-        }.flowOn(Dispatchers.IO)
-    }
+    override fun getHomePageFeed() = networkBoundResource(
+        query = {
+            dao.getAllCards()
+        },
+        fetch = {
+            homePageFeedApi.getHomePageFeed()
+        },
+        saveFetchResult = { homePageFeed ->
+            // in a real app should use database transactions!
+            dao.deleteAllCards()
+            dao.insertCards(homePageFeed.page.cards)
+        },
+        shouldFetch = {
+            true // shouldFetch logic based off business requirements. For now, always fetch
+        }
+    )
 
 }
