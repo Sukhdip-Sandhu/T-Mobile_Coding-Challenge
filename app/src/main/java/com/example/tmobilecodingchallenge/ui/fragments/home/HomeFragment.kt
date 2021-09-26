@@ -31,16 +31,23 @@ class HomeFragment : Fragment() {
         setupRecyclerView()
 
         homeViewModel.viewState.observe(viewLifecycleOwner) { state ->
-            when(state){
+            when (state) {
                 is HomeViewModel.ViewState.Success -> {
                     binding.progressBar.visibility = View.INVISIBLE
+                    binding.errorView.visibility = View.GONE
+
                     setCardsList(state.homePageFeed.page.cards)
                 }
                 is HomeViewModel.ViewState.Error -> {
                     binding.progressBar.visibility = View.INVISIBLE
+                    binding.errorView.visibility = View.VISIBLE
+
+                    binding.errorTextview.text = state.error
+                    binding.retryButton.setOnClickListener { homeViewModel.onRetry() }
                 }
                 HomeViewModel.ViewState.Loading -> {
                     binding.progressBar.visibility = View.VISIBLE
+                    binding.errorView.visibility = View.GONE
                 }
             }
         }

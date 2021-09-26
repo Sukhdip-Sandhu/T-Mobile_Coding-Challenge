@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
+import java.net.UnknownHostException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -31,13 +32,24 @@ class HomeViewModel @Inject constructor(
                 .onStart {
                     _viewState.value = ViewState.Loading
                 }
-                .catch {
-                    _viewState.value = ViewState.Error("An unknown error occurred")
+                .catch { throwable ->
+                    when(throwable){
+                        is UnknownHostException -> {
+                            _viewState.value = ViewState.Error("An unknown error occurred. Check your network connection")
+                        }
+                        else -> {
+                            _viewState.value = ViewState.Error("An unknown error occurred")
+                        }
+                    }
                 }
                 .collect { homePageFeed ->
                     _viewState.value = ViewState.Success(homePageFeed)
                 }
         }
+    }
+
+    fun onRetry() {
+        getHomePageFeed()
     }
 
     sealed class ViewState {
