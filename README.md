@@ -15,8 +15,11 @@ I started by mocking the UI in Figma quickly just so I can get an overview of wh
 
 ✅ Retrofit, OkHttp for Network Layer
 
-## Assumptions
+## Assumptions / Design Decisions
 The specifications asked for
 > 5.	The view(s) which have image should set the height dynamically based on image resolution in the API response.
 
 In my solution I do not use the API response for the image sizing. Instead, I ensure the image fills the width of the screen and the height is adjusted accordingly. The aspect ratio of the image remains intact which is why I deemed this solution acceptable.
+
+---
+I also opted to keep the RecyclerView simple and only have one view type for each of the different card_type states. Given more time I would have explored multiple viewtypes.
